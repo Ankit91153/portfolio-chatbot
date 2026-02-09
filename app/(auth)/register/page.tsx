@@ -104,7 +104,7 @@ export default function RegisterPage() {
                         )}
                     </div>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-4">
+                <CardFooter className="flex flex-col gap-4 mt-5">
                     <Button type="submit" className="w-full" disabled={formik.isSubmitting}>
                         {formik.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Create account

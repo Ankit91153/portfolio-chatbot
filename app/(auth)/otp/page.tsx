@@ -46,7 +46,7 @@ export default function OtpPage() {
             setError(null);
             try {
                 await authService.verifyOtp(values);
-                router.push("/dashboard");
+                router.push("/profile");
             } catch (err) {
                 setError("Invalid OTP. Please try again.");
             }
@@ -79,7 +79,7 @@ export default function OtpPage() {
                         )}
                     </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="mt-5">
                     <Button type="submit" className="w-full" disabled={formik.isSubmitting}>
                         {formik.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Verify

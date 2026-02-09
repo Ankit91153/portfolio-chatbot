@@ -5,13 +5,11 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
-import { LayoutDashboard, Settings, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const sidebarItems = [
-    { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
-    { icon: User, label: "Profile", href: "/dashboard/profile" },
-    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+    { icon: User, label: "Profile", href: "/profile" },
 ];
 
 export default function DashboardLayout({
@@ -61,7 +59,7 @@ export default function DashboardLayout({
             {/* Main Content */}
             <div className="flex flex-1 flex-col">
                 <header className="flex h-14 items-center justify-between border-b bg-background px-4 lg:px-6">
-                    <h1 className="text-lg font-semibold md:text-xl">Dashboard</h1>
+                    <h1 className="text-lg font-semibold md:text-xl">Profile</h1>
                     <ModeToggle />
                 </header>
                 <main className="flex-1 p-4 lg:p-6">

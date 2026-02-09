@@ -48,7 +48,7 @@ export default function LoginPage() {
             setError(null);
             try {
                 await authService.login(values);
-                router.push("/dashboard");
+                router.push("/profile");
             } catch (err) {
                 setError("Invalid email or password.");
             }
@@ -77,18 +77,9 @@ export default function LoginPage() {
                         {formik.touched.email && formik.errors.email && (
                             <div className="text-red-500 text-xs">{formik.errors.email}</div>
                         )}
-                    </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
                             <Label htmlFor="password">Password</Label>
-                            <Link
-                                href="/forgot-password"
-                                className="text-sm text-muted-foreground underline hover:text-primary"
-                            >
-                                Forgot your password?
-                            </Link>
-                        </div>
-                        <Input
+
+                         <Input
                             id="password"
                             type="password"
                             placeholder="******"
@@ -98,8 +89,19 @@ export default function LoginPage() {
                             <div className="text-red-500 text-xs">{formik.errors.password}</div>
                         )}
                     </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-end">
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm text-muted-foreground underline hover:text-primary"
+                            >
+                                Forgot your password?
+                            </Link>
+                        </div>
+                       
+                    </div>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-4">
+                <CardFooter className="flex flex-col gap-4 mt-5">
                     <Button type="submit" className="w-full" disabled={formik.isSubmitting}>
                         {formik.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Login

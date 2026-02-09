@@ -3,9 +3,9 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
     const token = request.cookies.get("auth_token")?.value;
-    const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
+    const isProfile = request.nextUrl.pathname.startsWith("/profile");
 
-    if (isDashboard && !token) {
+    if (isProfile && !token) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -13,5 +13,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*"],
+    matcher: ["/profile/:path*"],
 };
