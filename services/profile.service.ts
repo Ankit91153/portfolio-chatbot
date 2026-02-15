@@ -1,41 +1,19 @@
+import { IApiBaseResponse } from "@/types/api";
 import api from "./api";
 import { ProfileData, BackendResumeResponse } from "@/types/profile";
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
 
-export interface ExtractResumeResponse {
-  success: boolean;
-  data?: ProfileData;
-  error?: string;
-}
-
-export interface SaveProfileResponse {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
 
 export const profileService = {
-  /**
-   * Extract data from uploaded resume file
-   * @param file - Resume file (PDF, DOC, DOCX)
-   * @returns Extracted profile data
-   */
-  extractResume: async (file: File): Promise<ExtractResumeResponse> => {
-    try {
+  extractResume: async (file: File): Promise<IApiBaseResponse<ProfileData>> => {
+  
       const formData = new FormData();
       formData.append("file", file);
 
       const response = await api.post<BackendResumeResponse>(
-        `${BACKEND_API_URL}/resume/parse_resume/`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        `/resume/parse_resume/`,
+        formData
       );
-      console.log(response.data,"jdbjkdbjdb")
 
       // Transform backend response to frontend format (add IDs)
       const transformedData: ProfileData = {
@@ -86,106 +64,17 @@ export const profileService = {
       };
 
       return {
-        success: true,
         data: transformedData,
       };
-    } catch (error: any) {
-      console.error("Error extracting resume:", error);
-      
-      // Handle axios error
-      if (error.response) {
-        // Backend returned an error response
-        const errorMessage = error.response.data?.detail || error.response.data?.error || "Failed to process resume";
-        return {
-          success: false,
-          error: errorMessage,
-        };
-      } else if (error.request) {
-        // Request was made but no response received
-        return {
-          success: false,
-          error: "Unable to connect to the server. Please check if the backend is running.",
-        };
-      } else {
-        // Something else happened
-        return {
-          success: false,
-          error: error.message || "An unexpected error occurred",
-        };
-      }
-    }
   },
 
-  /**
-   * Save or update user profile
-   * @param profileData - Complete profile data
-   * @returns Success response
-   */
-  saveProfile: async (profileData: ProfileData): Promise<SaveProfileResponse> => {
-    try {
-      // TODO: Replace with your actual backend endpoint
-      const response = await api.post("/api/profile", profileData);
-
-      return {
-        success: true,
-        message: response.data.message || "Profile saved successfully",
-      };
-    } catch (error: any) {
-      console.error("Error saving profile:", error);
-      
-      if (error.response) {
-        const errorMessage = error.response.data?.detail || error.response.data?.error || "Failed to save profile";
-        return {
-          success: false,
-          error: errorMessage,
-        };
-      } else if (error.request) {
-        return {
-          success: false,
-          error: "Unable to connect to the server",
-        };
-      } else {
-        return {
-          success: false,
-          error: error.message || "An unexpected error occurred",
-        };
-      }
-    }
+  saveProfile: async (profileData: ProfileData): Promise<IApiBaseResponse> => {
+    const response = await api.post("/api/profile", profileData);
+    return response
   },
 
-  /**
-   * Fetch user profile data
-   * @returns User profile data
-   */
-  getProfile: async (): Promise<{ success: boolean; data?: ProfileData; error?: string }> => {
-    try {
-      // TODO: Replace with your actual backend endpoint
-      const response = await api.get<ProfileData>("/api/profile");
-
-      return {
-        success: true,
-        data: response.data,
-      };
-    } catch (error: any) {
-      console.error("Error fetching profile:", error);
-      
-      if (error.response) {
-        const errorMessage = error.response.data?.detail || error.response.data?.error || "Failed to fetch profile";
-        return {
-          success: false,
-          error: errorMessage,
-        };
-      } else if (error.request) {
-        return {
-          success: false,
-          error: "Unable to connect to the server",
-        };
-      } else {
-        return {
-          success: false,
-          error: error.message || "An unexpected error occurred",
-        };
-      }
-    }
+  getProfile: async (): Promise<IApiBaseResponse<ProfileData>> => {
+      const response = await api.get("/api/profile");
+      return response.data
   },
 };

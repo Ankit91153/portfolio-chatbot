@@ -1,49 +1,34 @@
 import api from "./api";
 import { z } from "zod";
 import { loginSchema, registerSchema, otpSchema, forgotPasswordSchema, resetPasswordSchema } from "@/lib/validators/auth";
+import { IApiBaseResponse } from "@/types/api";
+import { IForgotPassword, ILogin, IRegister, IResetPassword, IVerifyOtp } from "@/types/authService";
+import { retry } from "@/lib/retry";
 
 export type LoginData = z.infer<typeof loginSchema>;
 export type RegisterData = z.infer<typeof registerSchema>;
 export type OtpData = z.infer<typeof otpSchema>;
 
 export const authService = {
-    login: async (data: LoginData) => {
-        // Mock API call
-        console.log("Login data:", data);
-        return new Promise<{ token: string; user: { name: string; email: string } }>((resolve) =>
-            setTimeout(() => {
-                const token = "dummy-jwt-token";
-                document.cookie = `auth_token=${token}; path=/; max-age=86400`;
-                resolve({ token: token, user: { name: "Test User", email: data.email } });
-            }, 1000)
-        );
+    login: async (data: LoginData):Promise<IApiBaseResponse<ILogin>> => {
+        const response =await api.post("/auth/login",data)
+        return response.data
     },
-    register: async (data: RegisterData) => {
-        console.log("Register data:", data);
-        return new Promise<{ message: string }>((resolve) =>
-            setTimeout(() => resolve({ message: "OTP sent successfully" }), 1000)
-        );
+    register: async (data: RegisterData):Promise<IApiBaseResponse<IRegister>> => {
+        const response =await api.post("/auth/signup",data)
+        console.log(response)
+        return response.data
     },
-    verifyOtp: async (data: OtpData) => {
-        console.log("OTP data:", data);
-        return new Promise<{ token: string; user: { name: string } }>((resolve) =>
-            setTimeout(() => {
-                const token = "dummy-jwt-token";
-                document.cookie = `auth_token=${token}; path=/; max-age=86400`;
-                resolve({ token: token, user: { name: "Test User" } });
-            }, 1000)
-        );
+    verifyOtp: async (data: OtpData):Promise<IApiBaseResponse<IVerifyOtp>> => {
+        return retry((config)=> api.post("/otp/verify",data,config).then((res)=>res.data))
+        
     },
-    forgotPassword: async (data: z.infer<typeof forgotPasswordSchema>) => {
-        console.log("Forgot password:", data);
-        return new Promise<{ message: string }>((resolve) =>
-            setTimeout(() => resolve({ message: "Reset link/OTP sent" }), 1000)
-        );
+    forgotPassword: async (data: z.infer<typeof forgotPasswordSchema>):Promise<IApiBaseResponse<IForgotPassword>> => {
+        const response =await api.post("/password/forgot",data)
+        return response
     },
-    resetPassword: async (data: z.infer<typeof resetPasswordSchema>) => {
-        console.log("Reset password:", data);
-        return new Promise<{ message: string }>((resolve) =>
-            setTimeout(() => resolve({ message: "Password reset successfully" }), 1000)
-        );
+    resetPassword: async (data: z.infer<typeof resetPasswordSchema>):Promise<IApiBaseResponse<IResetPassword>> => {
+        const response =await api.post("/password/reset",data)
+        return response
     }
 };

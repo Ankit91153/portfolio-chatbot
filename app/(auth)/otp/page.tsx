@@ -1,91 +1,97 @@
 "use client";
 
-import { useFormik } from "formik";
+import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardFooter,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { otpSchema } from "@/lib/validators/auth";
+import { otpSchema } from "@/lib/validators/auth"; // Yup schema
 import { authService } from "@/services/auth.service";
-import { useState } from "react";
-import { z } from "zod";
+import { toast } from "sonner";
+import { useRegisterStore } from "@/stores/registerSlice";
 
 export default function OtpPage() {
-    const router = useRouter();
-    const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { email, userId, clearRegisterData } = useRegisterStore();
 
-    const formik = useFormik({
-        initialValues: {
-            otp: "",
-        },
-        validate: (values) => {
-            try {
-                otpSchema.parse(values);
-                return {};
-            } catch (error) {
-                if (error instanceof z.ZodError) {
-                    return error.issues.reduce((acc: Record<string, string>, curr) => {
-                        const key = curr.path[0] as string;
-                        acc[key] = curr.message;
-                        return acc;
-                    }, {} as Record<string, string>);
-                }
-                return {};
-            }
-        },
-        onSubmit: async (values) => {
-            setError(null);
-            try {
-                await authService.verifyOtp(values);
-                router.push("/profile");
-            } catch (err) {
-                setError("Invalid OTP. Please try again.");
-            }
-        },
-    });
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-2xl">Verify OTP</CardTitle>
+        <CardDescription>
+          Enter the 6-digit code sent to your email
+          {email && (
+            <span className="block mt-1 text-sm text-muted-foreground">
+              OTP sent to: <strong>{email}</strong>
+            </span>
+          )}
+        </CardDescription>
+      </CardHeader>
 
-    return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle className="text-2xl">Verify OTP</CardTitle>
-                <CardDescription>
-                    Enter the 6-digit code sent to your email
-                </CardDescription>
-            </CardHeader>
-            <form onSubmit={formik.handleSubmit}>
-                <CardContent className="space-y-4">
-                    {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
-                    <div className="space-y-2">
-                        <Label htmlFor="otp">One-Time Password</Label>
-                        <Input
-                            id="otp"
-                            type="text"
-                            placeholder="123456"
-                            maxLength={6}
-                            className="tracking-widest"
-                            {...formik.getFieldProps("otp")}
-                        />
-                        {formik.touched.otp && formik.errors.otp && (
-                            <div className="text-red-500 text-xs">{formik.errors.otp}</div>
-                        )}
-                    </div>
-                </CardContent>
-                <CardFooter className="mt-5">
-                    <Button type="submit" className="w-full" disabled={formik.isSubmitting}>
-                        {formik.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Verify
-                    </Button>
-                </CardFooter>
-            </form>
-        </Card>
-    );
+      <Formik
+        initialValues={{ otp: "" }}
+        validationSchema={otpSchema}
+        validateOnChange
+        validateOnBlur
+        validateOnMount
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            // send email + userId + otp to backend
+            await authService.verifyOtp({ email, userId, otp: values.otp });
+            toast.success("OTP verified!");
+            clearRegisterData(); 
+            router.push("/login");
+          } catch (err: any) {
+            console.log(err);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ values, errors, touched, handleChange, handleBlur, isSubmitting, isValid, dirty }) => (
+          <Form>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="otp">One-Time Password</Label>
+                <Input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  placeholder="123456"
+                  maxLength={6}
+                  className="tracking-widest"
+                  value={values.otp}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {(touched.otp || values.otp) && errors.otp && (
+                  <div className="text-red-500 text-xs">{errors.otp}</div>
+                )}
+              </div>
+            </CardContent>
+
+            <CardFooter className="mt-5">
+              <Button
+                type="submit"
+                className="w-full flex items-center justify-center"
+                disabled={!dirty || !isValid || isSubmitting}
+              >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Verify
+              </Button>
+            </CardFooter>
+          </Form>
+        )}
+      </Formik>
+    </Card>
+  );
 }
