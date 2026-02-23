@@ -22,10 +22,13 @@ import { ProfileData } from "@/types/profile";
 export default function ProfilePage() {
   const router = useRouter();
   const { accessToken } = useAuthStore();
-  
+
   // Protect route - redirect if not logged in
   useEffect(() => {
-    if (!accessToken && !(typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+    if (
+      !accessToken &&
+      !(typeof window !== "undefined" && localStorage.getItem("access_token"))
+    ) {
       toast.error("Please login first");
       router.push("/login");
     }
@@ -51,7 +54,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
 
   const handleDataExtracted = (extractedData: Partial<ProfileData>) => {
-    console.log(extractedData)
+    console.log(extractedData);
     setProfileData((prev) => ({
       ...prev,
       ...extractedData,
@@ -74,17 +77,25 @@ export default function ProfilePage() {
       const result = await profileService.saveProfile(profileData);
 
       if (!result.success) {
-        throw new Error(result.error || "Failed to save profile");
+        throw new Error(
+          typeof result.error === "string"
+            ? result.error
+            : Array.isArray(result.error)
+              ? result.error.join(", ")
+              : "Failed to save profile",
+        );
       }
 
       toast.success("Profile Saved!", {
-        description: result.message || "Your profile has been saved successfully.",
+        description:
+          result.message || "Your profile has been saved successfully.",
         id: loadingToast,
       });
     } catch (error) {
       console.error("Error saving profile:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save profile";
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to save profile";
+
       toast.error("Save Failed", {
         description: errorMessage,
         id: loadingToast,
