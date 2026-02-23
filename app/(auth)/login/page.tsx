@@ -4,6 +4,7 @@ import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,10 +18,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginSchema } from "@/lib/validators/auth";
 import { authService } from "@/services/auth.service";
-import { toast } from "sonner"; // Optional: toast library
+import { useAuthStore } from "@/stores";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setTokens, setUser, accessToken } = useAuthStore();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (accessToken || (typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+      router.push("/profile");
+    }
+  }, [accessToken, router]);
 
   return (
     <Card className="w-full">
@@ -42,10 +52,35 @@ export default function LoginPage() {
         validateOnMount={true}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            await authService.login(values);
-            router.push("/profile");
+            const response = await authService.login(values);
+            
+            console.log("Login response:", response); // Debug log
+            
+            if (response.success && response.data) {
+              setTokens(response.data.access_token, response.data.refresh_token);
+       
+              
+              // Store user data if available
+              if (response.data.user) {
+                setUser(response.data.user);
+              }
+              
+              toast.success("Login Successful!", {
+                description: response.message || "Welcome back!",
+              });
+              router.push('/profile')
+            } else {
+              // Handle unsuccessful response
+              toast.error("Login Failed", {
+                description: response.message || "Invalid credentials",
+              });
+            }
           } catch (err: any) {
-            console.log(err)
+            console.error("Login error:", err); // Debug log
+            const errorMessage = err?.response?.data?.detail || err?.response?.data?.message || "Login failed. Please try again.";
+            toast.error("Login Failed", {
+              description: errorMessage,
+            });
           } finally {
             setSubmitting(false);
           }

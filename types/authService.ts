@@ -1,5 +1,8 @@
-export interface ILogin{
-
+export interface ILogin {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  user?: any;
 }
 export interface IRegister{
     email:string
@@ -11,9 +14,11 @@ export interface IVerifyOtp{
 }
 
 export interface IForgotPassword{
-
+    email: string;
+    user_id: string;
 }
 
 export interface IResetPassword{
-
+    email?: string;
+    message?: string;
 }

@@ -18,9 +18,11 @@ import { Label } from "@/components/ui/label";
 import { forgotPasswordSchema } from "@/lib/validators/auth";
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner"; // optional for error notifications
+import { useRegisterStore } from "@/stores";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const setRegisterData = useRegisterStore((state) => state.setRegisterData);
 
   return (
     <Card className="w-full">
@@ -39,11 +41,14 @@ export default function ForgotPasswordPage() {
         validateOnMount={true}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            await authService.forgotPassword(values);
+           const response= await authService.forgotPassword(values);
+            setRegisterData(response?.data?.email, response?.data?.user_id);
             toast.success("OTP sent to your email!");
-            router.push("/otp");
+            router.push("/reset-password");
           } catch (err: any) {
-            console.log(err)
+            const errorMessage = err?.response?.data?.detail || err?.response?.data?.message || "Failed to send OTP";
+            toast.error(errorMessage);
+            console.error(err);
           } finally {
             setSubmitting(false);
           }

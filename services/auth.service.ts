@@ -1,34 +1,76 @@
 import api from "./api";
-import { z } from "zod";
-import { loginSchema, registerSchema, otpSchema, forgotPasswordSchema, resetPasswordSchema } from "@/lib/validators/auth";
-import { IApiBaseResponse } from "@/types/api";
-import { IForgotPassword, ILogin, IRegister, IResetPassword, IVerifyOtp } from "@/types/authService";
+import {
+  IApiBaseResponse
+} from "@/types/api";
+import {
+  IForgotPassword,
+  ILogin,
+  IRegister,
+  IResetPassword,
+  IVerifyOtp,
+} from "@/types/authService";
 import { retry } from "@/lib/retry";
 
-export type LoginData = z.infer<typeof loginSchema>;
-export type RegisterData = z.infer<typeof registerSchema>;
-export type OtpData = z.infer<typeof otpSchema>;
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  full_name: string;
+  email: string;
+  password: string;
+}
+
+export interface OtpData {
+  otp: string;
+}
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  email: string;
+  otp_code: string;
+  new_password: string;
+}
 
 export const authService = {
-    login: async (data: LoginData):Promise<IApiBaseResponse<ILogin>> => {
-        const response =await api.post("/auth/login",data)
-        return response.data
-    },
-    register: async (data: RegisterData):Promise<IApiBaseResponse<IRegister>> => {
-        const response =await api.post("/auth/signup",data)
-        console.log(response)
-        return response.data
-    },
-    verifyOtp: async (data: OtpData):Promise<IApiBaseResponse<IVerifyOtp>> => {
-        return retry((config)=> api.post("/otp/verify",data,config).then((res)=>res.data))
-        
-    },
-    forgotPassword: async (data: z.infer<typeof forgotPasswordSchema>):Promise<IApiBaseResponse<IForgotPassword>> => {
-        const response =await api.post("/password/forgot",data)
-        return response
-    },
-    resetPassword: async (data: z.infer<typeof resetPasswordSchema>):Promise<IApiBaseResponse<IResetPassword>> => {
-        const response =await api.post("/password/reset",data)
-        return response
-    }
+  login: async (data: LoginData): Promise<IApiBaseResponse<ILogin>> => {
+    const response = await api.post("/auth/login", data);
+    return response.data;
+  },
+  register: async (
+    data: RegisterData,
+  ): Promise<IApiBaseResponse<IRegister>> => {
+    const response = await api.post("/auth/signup", data);
+    return response.data;
+  },
+  verifyOtp: async (data: OtpData): Promise<IApiBaseResponse<IVerifyOtp>> => {
+    return retry((config) =>
+      api.post("/otp/verify", data, config).then((res) => res.data),
+    );
+  },
+  forgotPassword: async (
+    data: ForgotPasswordData,
+  ): Promise<IApiBaseResponse<IForgotPassword>> => {
+    console.log(data);
+    const response = await api.post<IApiBaseResponse<IForgotPassword>>(
+      "/password/forget",
+      null, // empty body
+      {
+        params: {
+          email: data.email,
+        },
+      },
+    );
+    return response.data;
+  },
+  resetPassword: async (
+    data: ResetPasswordData,
+  ): Promise<IApiBaseResponse<IResetPassword>> => {
+    const response = await api.post("/password/reset", data);
+    return response.data;
+  },
 };

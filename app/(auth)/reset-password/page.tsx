@@ -2,7 +2,7 @@
 
 import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,22 +14,46 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { resetPasswordSchema } from "@/lib/validators/auth"; // Yup schema
+import { resetPasswordSchema } from "@/lib/validators/auth";
 import { authService } from "@/services/auth.service";
-import { toast } from "sonner"; // optional for notifications
+import { toast } from "sonner";
+import { useRegisterStore } from "@/stores";
+import { useEffect } from "react";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const { email ,clearRegisterData} = useRegisterStore();
+
+  // Redirect if no email (user didn't come from forgot password flow)
+  useEffect(() => {
+    if (!email) {
+      toast.error("Please request a password reset first");
+      router.push("/forgot-password");
+    }
+  }, []);
+
+  if (!email) {
+    return null;
+  }
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Reset Password</CardTitle>
-        <CardDescription>Enter your new password below</CardDescription>
+        <CardDescription>
+          Enter the OTP sent to your email and create a new password
+        </CardDescription>
+        
+        {/* Email Display */}
+        <div className="flex items-center gap-2 mt-4 p-3 bg-muted rounded-md">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">{email}</span>
+        </div>
       </CardHeader>
 
       <Formik
         initialValues={{
+          otp: "",
           password: "",
           confirmPassword: "",
         }}
@@ -39,11 +63,20 @@ export default function ResetPasswordPage() {
         validateOnMount={true}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            await authService.resetPassword(values);
+            // Prepare data for backend
+            const resetData = {
+              email: email,
+              otp_code: values.otp,
+              new_password: values.password,
+            };
+
+            await authService.resetPassword(resetData);
             toast.success("Password reset successfully!");
+            clearRegisterData()
             router.push("/login");
+            console.log("RRRRRRRRRRRRRRRRR")
           } catch (err: any) {
-            console.log(err)
+            console.error(err);
           } finally {
             setSubmitting(false);
           }
@@ -52,13 +85,31 @@ export default function ResetPasswordPage() {
         {({ values, errors, touched, handleChange, handleBlur, isSubmitting, isValid, dirty }) => (
           <Form>
             <CardContent className="space-y-4">
+              {/* OTP Field */}
+              <div className="space-y-2">
+                <Label htmlFor="otp">OTP Code</Label>
+                <Input
+                  id="otp"
+                  type="text"
+                  placeholder="Enter 6-digit OTP"
+                  name="otp"
+                  maxLength={6}
+                  value={values.otp}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {(touched.otp || values.otp) && errors.otp && (
+                  <div className="text-red-500 text-xs">{errors.otp}</div>
+                )}
+              </div>
+
               {/* New Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">New Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="******"
+                  placeholder="Enter new password"
                   name="password"
                   value={values.password}
                   onChange={handleChange}
@@ -75,7 +126,7 @@ export default function ResetPasswordPage() {
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="******"
+                  placeholder="Confirm new password"
                   name="confirmPassword"
                   value={values.confirmPassword}
                   onChange={handleChange}
@@ -88,7 +139,7 @@ export default function ResetPasswordPage() {
               </div>
             </CardContent>
 
-            <CardFooter className="flex flex-col gap-4">
+            <CardFooter className="flex flex-col gap-4 mt-4">
               <Button
                 type="submit"
                 className="w-full flex items-center justify-center"
@@ -97,6 +148,17 @@ export default function ResetPasswordPage() {
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Reset Password
               </Button>
+
+              <div className="text-center text-sm text-muted-foreground">
+                Didn't receive the OTP?{" "}
+                <button
+                  type="button"
+                  onClick={() => router.push("/forgot-password")}
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Request again
+                </button>
+              </div>
             </CardFooter>
           </Form>
         )}

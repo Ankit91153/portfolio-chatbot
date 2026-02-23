@@ -9,13 +9,29 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,  
       refreshToken: null,     
       setUser: (user) => set({ user }),
-      setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+      setTokens: (accessToken, refreshToken) => {
+        // Store in Zustand state
+        set({ accessToken, refreshToken });
+        
+      },
+      logout: () => {
+        // Clear Zustand state
+        set({ user: null, accessToken: null, refreshToken: null });
+        
+        // Clear localStorage
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
+          localStorage.removeItem("token_type");
+          localStorage.removeItem("token");
+        }
+      },
     }),
     {
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
+        accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
     }

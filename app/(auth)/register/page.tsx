@@ -2,6 +2,9 @@
 
 import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 import {
   Card,
@@ -17,12 +20,20 @@ import { Button } from "@/components/ui/button";
 
 import { registerSchema } from "@/lib/validators/auth";
 import { authService } from "@/services/auth.service";
-import { useRegisterStore } from "@/stores";
+import { useRegisterStore, useAuthStore } from "@/stores";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
   const setRegisterData = useRegisterStore((state) => state.setRegisterData);
+  const { accessToken } = useAuthStore();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (accessToken || (typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+      router.push("/profile");
+    }
+  }, [accessToken, router]);
 
   return (
     <Card className="w-full">
@@ -46,14 +57,13 @@ export default function RegisterPage() {
         onSubmit={async (values, { setSubmitting }) => {
           try {
            const response= await authService.register(values);
-           setRegisterData(response.email, response.user_id);
-
-           console.log(response)
-
+           setRegisterData(response?.data?.email, response?.data?.user_id);
             router.push("/otp");
             toast.success("OTP sent on email")
           } catch (err: any) {
-            console.log(err);
+            const errorMessage = err?.response?.data?.detail || err?.response?.data?.message || "Registration failed";
+            toast.error(errorMessage);
+            console.error(err);
           } finally {
             setSubmitting(false);
           }
@@ -121,14 +131,25 @@ export default function RegisterPage() {
 
             </CardContent>
 
-            <CardFooter className="mt-4">
+            <CardFooter className="flex flex-col gap-4 mt-4">
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full flex items-center justify-center"
                 disabled={!dirty || !isValid || isSubmitting}
               >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isSubmitting ? "Creating..." : "Create Account"}
               </Button>
+
+              <div className="text-center text-sm">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Login
+                </Link>
+              </div>
             </CardFooter>
           </Form>
         )}

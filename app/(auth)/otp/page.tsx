@@ -46,7 +46,7 @@ export default function OtpPage() {
         onSubmit={async (values, { setSubmitting }) => {
           try {
             // send email + userId + otp to backend
-            await authService.verifyOtp({ email, userId, otp: values.otp });
+            await authService.verifyOtp({ email, userId, otp_code: values.otp });
             toast.success("OTP verified!");
             clearRegisterData(); 
             router.push("/login");

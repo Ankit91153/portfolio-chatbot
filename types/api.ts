@@ -1,6 +1,6 @@
 export interface IApiBaseResponse<T=unknown> {
     success?: boolean;
-    data?: T;
-    error?: string;
+    data: T;
+    error?: [] | string;
     message?: string;
 }

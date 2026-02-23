@@ -25,7 +25,21 @@ export async function retry<T>(
       }
     }
   
-    if (lastError?.message) toast.error(lastError.message);
+    if (lastError?.message) {
+      let showError = "";
+
+      const responseData = lastError.response?.data;
+
+      if (responseData?.errors) {
+        const errorMessages = Object.values(responseData.errors);
+        showError = errorMessages.join("\n");
+
+        toast.error(showError);
+      } else if (responseData?.message) {
+        showError = responseData.message;
+        toast.error(showError);
+      }
+    }
     throw lastError;
   }
   

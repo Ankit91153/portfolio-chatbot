@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { profileService } from "@/services/profile.service";
+import { useAuthStore } from "@/stores";
 import { FileUploader } from "@/components/profile/FileUploader";
 import { AboutMeSection } from "@/components/profile/AboutMeSection";
 import { PersonalInfoSection } from "@/components/profile/PersonalInfoSection";
@@ -18,6 +20,16 @@ import { AchievementSection } from "@/components/profile/AchievementSection";
 import { ProfileData } from "@/types/profile";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { accessToken } = useAuthStore();
+  
+  // Protect route - redirect if not logged in
+  useEffect(() => {
+    if (!accessToken && !(typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+      toast.error("Please login first");
+      router.push("/login");
+    }
+  }, [accessToken, router]);
   const [profileData, setProfileData] = useState<ProfileData>({
     aboutMe: "",
     personalInfo: {

@@ -24,16 +24,20 @@ export const otpSchema = Yup.object({
 });
 
 export const forgotPasswordSchema = Yup.object({
-    email: Yup.string().email("Invalid email address"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
 });
 
 export const resetPasswordSchema = Yup.object({
-    password: Yup.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: Yup.string().min(6, "Password must be at least 6 characters"),
-}).test(
-    "passwords-match",
-    "Passwords do not match",
-    function (value) {
-      return value?.password === value?.confirmPassword;
-    }
-  );
+    otp: Yup.string()
+      .length(6, "OTP must be 6 digits")
+      .required("OTP is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+    confirmPassword: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Confirm password is required")
+      .oneOf([Yup.ref('password')], 'Passwords must match'),
+});
