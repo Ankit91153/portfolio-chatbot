@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data: BackendResumeResponse = await response.json();
+    const {data}: BackendResumeResponse = await response.json();
 
     // Transform backend response to frontend format (add IDs)
     const transformedData = {

@@ -90,14 +90,13 @@ export interface BackendAchievement {
 }
 
 export interface BackendResumeResponse {
-  data:{
- aboutMe: string;
-  personalInfo: PersonalInfo;
-  educations: BackendEducation[];
-  skills: string[];
-  experience: BackendExperience[];
-  certifications: BackendCertification[];
-  achievements: BackendAchievement[];
-  }
- 
+  data: {
+    aboutMe: string;
+    personalInfo: PersonalInfo;
+    educations: BackendEducation[];
+    skills: string[];
+    experience: BackendExperience[];
+    certifications: BackendCertification[];
+    achievements: BackendAchievement[];
+  };
 }

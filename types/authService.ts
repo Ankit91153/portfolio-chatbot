@@ -10,7 +10,8 @@ export interface IRegister{
 }
 
 export interface IVerifyOtp{
-
+    email:string
+    user_id:string
 }
 
 export interface IForgotPassword{

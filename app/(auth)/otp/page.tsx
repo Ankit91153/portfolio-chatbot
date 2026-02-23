@@ -21,7 +21,7 @@ import { useRegisterStore } from "@/stores/registerSlice";
 
 export default function OtpPage() {
   const router = useRouter();
-  const { email, userId, clearRegisterData } = useRegisterStore();
+  const { email, clearRegisterData } = useRegisterStore();
 
   return (
     <Card className="w-full">
@@ -45,10 +45,13 @@ export default function OtpPage() {
         validateOnMount
         onSubmit={async (values, { setSubmitting }) => {
           try {
+            if (!email) {
+              return;
+            }
             // send email + userId + otp to backend
-            await authService.verifyOtp({ email, userId, otp_code: values.otp });
+            await authService.verifyOtp({ email, otp_code: values.otp });
             toast.success("OTP verified!");
-            clearRegisterData(); 
+            clearRegisterData();
             router.push("/login");
           } catch (err: any) {
             console.log(err);
@@ -57,7 +60,16 @@ export default function OtpPage() {
           }
         }}
       >
-        {({ values, errors, touched, handleChange, handleBlur, isSubmitting, isValid, dirty }) => (
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          isSubmitting,
+          isValid,
+          dirty,
+        }) => (
           <Form>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -85,7 +97,9 @@ export default function OtpPage() {
                 className="w-full flex items-center justify-center"
                 disabled={!dirty || !isValid || isSubmitting}
               >
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Verify
               </Button>
             </CardFooter>

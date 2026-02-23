@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -23,11 +29,16 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/msword",
     ];
-    
+
     const allowedExtensions = [".pdf", ".doc", ".docx"];
-    const fileExtension = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
-    
-    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+    const fileExtension = file.name
+      .toLowerCase()
+      .slice(file.name.lastIndexOf("."));
+
+    if (
+      !allowedTypes.includes(file.type) &&
+      !allowedExtensions.includes(fileExtension)
+    ) {
       return "Invalid file format. Only PDF, DOC, and DOCX files are supported.";
     }
 
@@ -70,22 +81,30 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
       const result = await profileService.extractResume(file);
 
       if (!result.success || !result.data) {
-        throw new Error(result.error || "Failed to extract data from resume");
+        throw new Error(
+          typeof result.error === "string"
+            ? result.error
+            : Array.isArray(result.error)
+              ? result.error.join(", ")
+              : "Failed to extract data from resume",
+        );
       }
 
       // Success
       toast.success("Resume Processed Successfully!", {
-        description: "Your information has been extracted and filled in the form.",
+        description:
+          "Your information has been extracted and filled in the form.",
         id: loadingToast,
       });
 
-      console.log(result)
+      console.log(result);
       onDataExtracted(result.data);
       setFileError(null);
     } catch (error) {
       console.error("Error uploading file:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to process resume";
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to process resume";
+
       setFileError(errorMessage);
       toast.error("Processing Failed", {
         description: errorMessage,
@@ -105,9 +124,10 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
           <h3 className="text-lg font-semibold">Upload Resume</h3>
         </div>
         <p className="text-sm text-muted-foreground">
-          Upload your resume (PDF, DOC, or DOCX) and we'll automatically extract your information
+          Upload your resume (PDF, DOC, or DOCX) and we'll automatically extract
+          your information
         </p>
-        
+
         <div className="space-y-3">
           <div className="flex items-center gap-4">
             <Button
@@ -149,7 +169,9 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
             <div className="flex items-start gap-2 p-3 rounded-md bg-destructive/10 border border-destructive/20">
               <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-destructive">File Format Error</p>
+                <p className="text-sm font-medium text-destructive">
+                  File Format Error
+                </p>
                 <p className="text-sm text-destructive/80 mt-1">{fileError}</p>
               </div>
             </div>

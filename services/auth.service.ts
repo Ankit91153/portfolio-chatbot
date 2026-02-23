@@ -23,7 +23,8 @@ export interface RegisterData {
 }
 
 export interface OtpData {
-  otp: string;
+  otp_code: string;
+  email:string;
 }
 
 export interface ForgotPasswordData {
