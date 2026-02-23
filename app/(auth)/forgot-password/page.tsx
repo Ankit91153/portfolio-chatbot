@@ -1,96 +1,102 @@
 "use client";
 
-import { useFormik } from "formik";
+import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-    CardFooter,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { forgotPasswordSchema } from "@/lib/validators/auth";
 import { authService } from "@/services/auth.service";
-import { useState } from "react";
-import { z } from "zod";
+import { toast } from "sonner"; // optional for error notifications
+import { useRegisterStore } from "@/stores";
 
 export default function ForgotPasswordPage() {
-    const router = useRouter();
-    const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const setRegisterData = useRegisterStore((state) => state.setRegisterData);
 
-    const formik = useFormik({
-        initialValues: {
-            email: "",
-        },
-        validate: (values) => {
-            try {
-                forgotPasswordSchema.parse(values);
-                return {};
-            } catch (error) {
-                if (error instanceof z.ZodError) {
-                    return error.issues.reduce((acc: Record<string, string>, curr) => {
-                        const key = curr.path[0] as string;
-                        acc[key] = curr.message;
-                        return acc;
-                    }, {} as Record<string, string>);
-                }
-                return {};
-            }
-        },
-        onSubmit: async (values) => {
-            setError(null);
-            try {
-                await authService.forgotPassword(values);
-                router.push("/otp");
-            } catch (err) {
-                setError("Something went wrong. Please try again.");
-            }
-        },
-    });
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-2xl">Forgot Password</CardTitle>
+        <CardDescription>
+          Enter your email to receive a password reset code
+        </CardDescription>
+      </CardHeader>
 
-    return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle className="text-2xl">Forgot Password</CardTitle>
-                <CardDescription>
-                    Enter your email to receive a password reset code
-                </CardDescription>
-            </CardHeader>
-            <form onSubmit={formik.handleSubmit}>
-                <CardContent className="space-y-4">
-                    {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            placeholder="m@example.com"
-                            {...formik.getFieldProps("email")}
-                        />
-                        {formik.touched.email && formik.errors.email && (
-                            <div className="text-red-500 text-xs">{formik.errors.email}</div>
-                        )}
-                    </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4 mt-5">
-                    <Button type="submit" className="w-full" disabled={formik.isSubmitting}>
-                        {formik.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Send OTP
-                    </Button>
-                    <div className="text-center text-sm">
-                        Remember your password?{" "}
-                        <Link href="/login" className="underline underline-offset-4 hover:text-primary">
-                            Login
-                        </Link>
-                    </div>
-                </CardFooter>
-            </form>
-        </Card>
-    );
+      <Formik
+        initialValues={{ email: "" }}
+        validationSchema={forgotPasswordSchema}
+        validateOnChange={true}
+        validateOnBlur={true}
+        validateOnMount={true}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+           const response= await authService.forgotPassword(values);
+            setRegisterData(response?.data?.email, response?.data?.user_id);
+            toast.success("OTP sent to your email!");
+            router.push("/reset-password");
+          } catch (err: any) {
+            const errorMessage = err?.response?.data?.detail || err?.response?.data?.message || "Failed to send OTP";
+            toast.error(errorMessage);
+            console.error(err);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ values, errors, touched, handleChange, handleBlur, isSubmitting, isValid, dirty }) => (
+          <Form>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {(touched.email || values.email) && errors.email && (
+                  <div className="text-red-500 text-xs">{errors.email}</div>
+                )}
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex flex-col gap-4 mt-5">
+              <Button
+                type="submit"
+                className="w-full flex items-center justify-center"
+                disabled={!dirty || !isValid || isSubmitting}
+              >
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Send OTP
+              </Button>
+
+              <div className="text-center text-sm">
+                Remember your password?{" "}
+                <Link
+                  href="/login"
+                  className="underline underline-offset-4 hover:text-primary"
+                >
+                  Login
+                </Link>
+              </div>
+            </CardFooter>
+          </Form>
+        )}
+      </Formik>
+    </Card>
+  );
 }

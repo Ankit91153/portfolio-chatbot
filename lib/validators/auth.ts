@@ -1,28 +1,43 @@
-import { z } from "zod";
+import * as Yup from "yup";
 
-export const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+export const loginSchema = Yup.object({
+    email: Yup.string().email("Invalid email address"),
+    password: Yup.string().min(6, "Password must be at least 6 characters"),
 });
 
-export const registerSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+export const registerSchema = Yup.object({
+    full_name: Yup.string()
+      .min(2, "Name must be at least 2 characters")
+      .required("Name is required"),
+  
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+  
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
+
+export const otpSchema = Yup.object({
+    otp: Yup.string().length(6, "OTP must be 6 digits"),
 });
 
-export const otpSchema = z.object({
-    otp: z.string().length(6, "OTP must be 6 digits"),
+export const forgotPasswordSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
 });
 
-export const forgotPasswordSchema = z.object({
-    email: z.string().email("Invalid email address"),
-});
-
-export const resetPasswordSchema = z.object({
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+export const resetPasswordSchema = Yup.object({
+    otp: Yup.string()
+      .length(6, "OTP must be 6 digits")
+      .required("OTP is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+    confirmPassword: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Confirm password is required")
+      .oneOf([Yup.ref('password')], 'Passwords must match'),
 });
