@@ -45,7 +45,7 @@ export interface Achievement {
   date: string;
 }
 
-export interface ProfileData {
+export interface ProfileContent {
   aboutMe: string;
   personalInfo: PersonalInfo;
   educations: Education[];
@@ -55,7 +55,17 @@ export interface ProfileData {
   achievements: Achievement[];
 }
 
-// Backend response types
+// Top-level payload sent to backend
+export interface ProfilePayload {
+  chat_id: string;
+  chat_name: string;
+  content: ProfileContent;
+}
+
+// Alias kept for backward compat inside components
+export type ProfileData = ProfileContent;
+
+// ─── Backend response types ───────────────────────────────────────────────────
 export interface BackendEducation {
   institution: string;
   degree: string;
@@ -99,4 +109,13 @@ export interface BackendResumeResponse {
     certifications: BackendCertification[];
     achievements: BackendAchievement[];
   };
+}
+export interface UserProfileResponse {
+    full_name: string;
+    email: string;
+    profileData: {
+      chat_id: string;
+      chat_name: string;
+      chat_content: ProfileContent;
+    } | null;
 }

@@ -6,24 +6,30 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      accessToken: null,  
-      refreshToken: null,     
+      accessToken: null,
+      refreshToken: null,
       setUser: (user) => set({ user }),
       setTokens: (accessToken, refreshToken) => {
-        // Store in Zustand state
+        // Update Zustand state
         set({ accessToken, refreshToken });
-        
+
+        // Keep localStorage in sync
+        if (typeof window !== "undefined") {
+          if (accessToken) localStorage.setItem("access_token", accessToken);
+          if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
+        }
       },
       logout: () => {
-        // Clear Zustand state
         set({ user: null, accessToken: null, refreshToken: null });
-        
-        // Clear localStorage
+
         if (typeof window !== "undefined") {
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("token_type");
-          localStorage.removeItem("token");
+          // Clear profile store too
+          localStorage.removeItem("profile-storage");
+          localStorage.removeItem("auth-storage");
+          
         }
       },
     }),

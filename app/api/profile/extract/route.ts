@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     backendFormData.append("file", file);
 
     // Call backend API
-    const response = await fetch(`${BACKEND_API_URL}/resume/parse_resume/`, {
+    const response = await fetch(`${BACKEND_API_URL}/resume/parse/`, {
       method: "POST",
       body: backendFormData,
     });

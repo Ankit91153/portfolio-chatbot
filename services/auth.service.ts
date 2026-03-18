@@ -1,10 +1,9 @@
 import api from "./api";
-import {
-  IApiBaseResponse
-} from "@/types/api";
+import { IApiBaseResponse } from "@/types/api";
 import {
   IForgotPassword,
   ILogin,
+  IRefreshToken,
   IRegister,
   IResetPassword,
   IVerifyOtp,
@@ -24,7 +23,7 @@ export interface RegisterData {
 
 export interface OtpData {
   otp_code: string;
-  email:string;
+  email: string;
 }
 
 export interface ForgotPasswordData {
@@ -35,6 +34,9 @@ export interface ResetPasswordData {
   email: string;
   otp_code: string;
   new_password: string;
+}
+export interface RefreshTokenData {
+  refresh_token: string;
 }
 
 export const authService = {
@@ -72,6 +74,13 @@ export const authService = {
     data: ResetPasswordData,
   ): Promise<IApiBaseResponse<IResetPassword>> => {
     const response = await api.post("/password/reset", data);
+    return response.data;
+  },
+
+  refreshToken: async (
+    data: RefreshTokenData,
+  ): Promise<IApiBaseResponse<IRefreshToken>> => {
+    const response = await api.post("/auth/refresh", data);
     return response.data;
   },
 };

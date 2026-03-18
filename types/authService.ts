@@ -23,3 +23,9 @@ export interface IResetPassword{
     email?: string;
     message?: string;
 }
+
+export interface IRefreshToken{
+    access_token:string,
+    refresh_token:string,
+    token_type:string
+}

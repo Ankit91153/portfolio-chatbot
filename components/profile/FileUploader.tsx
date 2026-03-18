@@ -80,14 +80,8 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
     try {
       const result = await profileService.extractResume(file);
 
-      if (!result.success || !result.data) {
-        throw new Error(
-          typeof result.error === "string"
-            ? result.error
-            : Array.isArray(result.error)
-              ? result.error.join(", ")
-              : "Failed to extract data from resume",
-        );
+      if (!result) {
+        throw new Error("Failed to extract data from resume");
       }
 
       // Success
@@ -96,8 +90,6 @@ export function FileUploader({ onDataExtracted }: FileUploaderProps) {
           "Your information has been extracted and filled in the form.",
         id: loadingToast,
       });
-
-      console.log(result);
       onDataExtracted(result.data);
       setFileError(null);
     } catch (error) {

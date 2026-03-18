@@ -23,7 +23,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="fullName"
             value={data.fullName}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            placeholder="John Doe"
+            placeholder="Ankit Pandey"
             className="mt-2"
           />
         </div>
@@ -34,7 +34,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             type="email"
             value={data.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            placeholder="john@example.com"
+            placeholder="ankitpandey@example.com"
             className="mt-2"
           />
         </div>
@@ -44,7 +44,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="phone"
             value={data.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
-            placeholder="+1 (555) 123-4567"
+            placeholder="+91 98567234783"
             className="mt-2"
           />
         </div>
@@ -54,7 +54,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="location"
             value={data.location}
             onChange={(e) => handleChange("location", e.target.value)}
-            placeholder="New York, NY"
+            placeholder="Phagwara, PB"
             className="mt-2"
           />
         </div>
@@ -64,7 +64,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="linkedin"
             value={data.linkedin || ""}
             onChange={(e) => handleChange("linkedin", e.target.value)}
-            placeholder="linkedin.com/in/johndoe"
+            placeholder="linkedin.com/in/ankitpandey"
             className="mt-2"
           />
         </div>
@@ -74,7 +74,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="github"
             value={data.github || ""}
             onChange={(e) => handleChange("github", e.target.value)}
-            placeholder="github.com/johndoe"
+            placeholder="github.com/ankitpandey"
             className="mt-2"
           />
         </div>
@@ -84,7 +84,7 @@ export function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps
             id="portfolio"
             value={data.portfolio || ""}
             onChange={(e) => handleChange("portfolio", e.target.value)}
-            placeholder="https://johndoe.com"
+            placeholder="https://ankitpandey.com"
             className="mt-2"
           />
         </div>

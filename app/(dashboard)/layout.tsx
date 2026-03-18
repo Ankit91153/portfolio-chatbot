@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { User, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores";
+import { useAuthStore, useProfileStore } from "@/stores";
 
 const sidebarItems = [
     { icon: User, label: "Profile", href: "/profile" },
@@ -21,9 +21,11 @@ export default function DashboardLayout({
     const pathname = usePathname();
     const router = useRouter();
     const { logout } = useAuthStore();
+    const { clearProfile } = useProfileStore();
 
     const handleLogout = () => {
         logout();
+        clearProfile();
         router.push("/login");
     };
 
