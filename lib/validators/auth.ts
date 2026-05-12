@@ -20,7 +20,7 @@ export const registerSchema = Yup.object({
   });
 
 export const otpSchema = Yup.object({
-    otp: Yup.string().length(6, "OTP must be 6 digits"),
+    otp: Yup.string().length(6, "OTP must be 6 digits").required("OTP is required"),
 });
 
 export const forgotPasswordSchema = Yup.object({

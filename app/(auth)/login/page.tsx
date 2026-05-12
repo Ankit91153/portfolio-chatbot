@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (accessToken || (typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+    if (accessToken) {
       router.push("/profile");
     }
   }, [accessToken, router]);
@@ -53,18 +53,22 @@ export default function LoginPage() {
         onSubmit={async (values, { setSubmitting }) => {
           try {
             const response = await authService.login(values);
-            
+
             console.log("Login response:", response); // Debug log
-            
+
             if (response.success && response.data) {
-              setTokens(response.data.access_token, response.data.refresh_token);
-       
-              
+              // Match the new backend payload (accessToken instead of access_token)
+              const token = (response.data as any).accessToken || (response.data as any).access_token;
+              const refreshToken = (response.data as any).refreshToken || (response.data as any).refresh_token;
+
+              setTokens(token, refreshToken);
+
+
               // Store user data if available
               if (response.data.user) {
                 setUser(response.data.user);
               }
-              
+
               toast.success("Login Successful!", {
                 description: response.message || "Welcome back!",
               });

@@ -39,18 +39,20 @@ export interface ResetPasswordData {
 
 export const authService = {
   login: async (data: LoginData): Promise<IApiBaseResponse<ILogin>> => {
-    const response = await api.post("/auth/login", data);
+    const response = await api.post("/api/auth/login", data);
     return response.data;
   },
   register: async (
     data: RegisterData,
   ): Promise<IApiBaseResponse<IRegister>> => {
-    const response = await api.post("/auth/signup", data);
+    const payload = { fullName: data.full_name, email: data.email, password: data.password };
+    const response = await api.post("/api/auth/signup", payload);
     return response.data;
   },
   verifyOtp: async (data: OtpData): Promise<IApiBaseResponse<IVerifyOtp>> => {
+    const payload = { email: data.email, otp: data.otp_code };
     return retry((config) =>
-      api.post("/otp/verify", data, config).then((res) => res.data),
+      api.post("/api/auth/verify-otp", payload, config).then((res) => res.data),
     );
   },
   forgotPassword: async (
@@ -58,20 +60,16 @@ export const authService = {
   ): Promise<IApiBaseResponse<IForgotPassword>> => {
     console.log(data);
     const response = await api.post<IApiBaseResponse<IForgotPassword>>(
-      "/password/forget",
-      null, // empty body
-      {
-        params: {
-          email: data.email,
-        },
-      },
+      "/api/auth/forgot-password",
+      data
     );
     return response.data;
   },
   resetPassword: async (
     data: ResetPasswordData,
   ): Promise<IApiBaseResponse<IResetPassword>> => {
-    const response = await api.post("/password/reset", data);
+    const payload = { email: data.email, otp: data.otp_code, newPassword: data.new_password };
+    const response = await api.post("/api/auth/reset-password", payload);
     return response.data;
   },
 };

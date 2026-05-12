@@ -11,7 +11,7 @@ export const profileService = {
       formData.append("file", file);
 
       const response = await api.post<BackendResumeResponse>(
-        `/resume/parse_resume/`,
+        `/api/professional-data/parse-resume`,
         formData
       );
 
@@ -64,17 +64,19 @@ export const profileService = {
       };
 
       return {
+        success: true,
         data: transformedData,
       };
   },
 
   saveProfile: async (profileData: ProfileData): Promise<IApiBaseResponse> => {
-    const response = await api.post("/api/profile", profileData);
-    return response
+    const response = await api.post("/api/professional-data", profileData);
+    return response.data;
   },
 
-  getProfile: async (): Promise<IApiBaseResponse<ProfileData>> => {
-      const response = await api.get("/api/profile");
-      return response.data
+  getProfile: async (): Promise<IApiBaseResponse<{ professionalData: ProfileData, defaultQuestions?: any[] }>> => {
+      // The backend /api/users/profile returns { data: { user, professionalData, compressedData, defaultQuestions } }
+      const response = await api.get("/api/users/profile");
+      return response.data;
   },
 };

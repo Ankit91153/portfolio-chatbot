@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Zap } from "lucide-react";
+import { Menu, Bot } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -19,19 +19,17 @@ export function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-14 items-center justify-between">
+            <div className="container flex h-14 items-center justify-between mx-auto">
                 <div className="flex items-center gap-2 font-bold text-xl">
                     <Link href="/" className="flex items-center gap-2">
-                        <Zap className="h-6 w-6 text-primary" />
-                        <span>PortfolioBot</span>
+                        <Bot className="h-6 w-6 text-primary" />
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">SmartFolio</span>
                     </Link>
                 </div>
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center gap-4">
-                    <Link href="/services" className="text-sm font-medium hover:underline underline-offset-4">
-                        Services
-                    </Link>
+
                     <div className="flex items-center gap-2">
                         <ModeToggle />
                         <Button variant="ghost" asChild>
@@ -58,9 +56,7 @@ export function Navbar() {
                                 <Link href="/" onClick={() => setIsOpen(false)} className="text-lg font-semibold">
                                     Home
                                 </Link>
-                                <Link href="/services" onClick={() => setIsOpen(false)} className="text-lg font-semibold">
-                                    Services
-                                </Link>
+
                                 <div className="flex flex-col gap-2 mt-4">
                                     <Button variant="outline" asChild onClick={() => setIsOpen(false)}>
                                         <Link href="/login">Login</Link>

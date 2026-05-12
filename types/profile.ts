@@ -53,6 +53,7 @@ export interface ProfileData {
   experience: Experience[];
   certifications: Certification[];
   achievements: Achievement[];
+  defaultQuestions?: { question: string; answer: string }[];
 }
 
 // Backend response types

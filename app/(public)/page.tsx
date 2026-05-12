@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, Code, Zap } from "lucide-react";
+import { ArrowRight, Bot, Code, Zap, MessageSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -25,12 +25,43 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       {/* Hero Section */}
-      <section className="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center space-y-8 bg-gradient-to-b from-background to-muted/20">
+      <section className="relative flex-1 flex flex-col items-center justify-center py-32 px-4 text-center overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/20 blur-[100px]" />
+          
+          {/* Floating Icons */}
+          <motion.div
+            animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[15%] left-[10%] opacity-20 dark:opacity-40 hidden md:block"
+          >
+            <Bot className="w-32 h-32 text-primary" />
+          </motion.div>
+
+          <motion.div
+            animate={{ y: [0, 30, 0], rotate: [0, -10, 10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[20%] right-[10%] opacity-20 dark:opacity-40 hidden md:block"
+          >
+            <MessageSquare className="w-24 h-24 text-purple-500" />
+          </motion.div>
+
+          <motion.div
+            animate={{ y: [0, -15, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute top-[25%] right-[25%] opacity-30 dark:opacity-50 hidden lg:block"
+          >
+            <Sparkles className="w-12 h-12 text-yellow-500" />
+          </motion.div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="space-y-4 max-w-3xl"
+          className="space-y-6 max-w-3xl relative z-10"
         >
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
             Build Your Intelligent Portfolio
@@ -52,7 +83,7 @@ export default function Home() {
             </Link>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <Link href="/services">Learn More</Link>
+            <Link href="#services">Learn More</Link>
           </Button>
         </motion.div>
       </section>
@@ -75,11 +106,11 @@ export default function Home() {
             <Card className="h-full hover:shadow-lg transition-shadow bg-card/50 backdrop-blur">
               <CardHeader>
                 <Bot className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>AI Integration</CardTitle>
-                <CardDescription>Advanced chatbot integration for your portfolio.</CardDescription>
+                <CardTitle>1-Click Resume Parsing</CardTitle>
+                <CardDescription>Instantly build your profile from your existing CV.</CardDescription>
               </CardHeader>
               <CardContent>
-                Engage with your visitors 24/7 using our smart AI agents trained on your profile.
+                Upload your PDF or Word resume and let our Groq-powered AI automatically extract your skills, experience, and education directly into your profile.
               </CardContent>
             </Card>
           </motion.div>
@@ -88,11 +119,11 @@ export default function Home() {
             <Card className="h-full hover:shadow-lg transition-shadow bg-card/50 backdrop-blur">
               <CardHeader>
                 <Code className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Modern Technology</CardTitle>
-                <CardDescription>Built with Next.js 15 and Tailwind CSS.</CardDescription>
+                <CardTitle>Personalized AI Assistant</CardTitle>
+                <CardDescription>A smart agent that represents you.</CardDescription>
               </CardHeader>
               <CardContent>
-                Experience blazing fast performance and SEO-optimized pages out of the box.
+                Visitors can chat 24/7 with an intelligent LLaMA-3 model trained exclusively on your background to learn about your achievements and capabilities.
               </CardContent>
             </Card>
           </motion.div>
@@ -101,11 +132,11 @@ export default function Home() {
             <Card className="h-full hover:shadow-lg transition-shadow bg-card/50 backdrop-blur">
               <CardHeader>
                 <Zap className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>Fast Deployment</CardTitle>
-                <CardDescription>Deploy your site in seconds.</CardDescription>
+                <CardTitle>Total Data Control</CardTitle>
+                <CardDescription>You own your professional data.</CardDescription>
               </CardHeader>
               <CardContent>
-                Get your portfolio up and running instantly with our streamlined process.
+                Review, edit, and fine-tune what the chatbot knows about you. Set custom Q&A rules to handle specific questions exactly how you want them answered.
               </CardContent>
             </Card>
           </motion.div>

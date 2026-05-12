@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores";
 
@@ -31,8 +31,9 @@ export default function DashboardLayout({
         <div className="flex min-h-screen bg-muted/20">
             {/* Sidebar */}
             <aside className="hidden w-64 border-r bg-background lg:block">
-                <div className="flex h-14 items-center border-b px-4 font-bold text-xl">
-                    PortfolioBot
+                <div className="flex h-14 items-center gap-2 border-b px-4 font-bold text-xl">
+                    <Bot className="h-6 w-6 text-primary" />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">SmartFolio</span>
                 </div>
                 <nav className="flex flex-col gap-2 p-4">
                     {sidebarItems.map((item) => (

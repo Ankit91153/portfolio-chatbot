@@ -30,7 +30,7 @@ export default function RegisterPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (accessToken || (typeof window !== "undefined" && localStorage.getItem("access_token"))) {
+    if (accessToken) {
       router.push("/profile");
     }
   }, [accessToken, router]);
@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
       <Formik
         initialValues={{
-            full_name: "",
+          full_name: "",
           email: "",
           password: "",
         }}
@@ -56,8 +56,9 @@ export default function RegisterPage() {
         validateOnMount={true}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-           const response= await authService.register(values);
-           setRegisterData(response?.data?.email, response?.data?.user_id);
+            const response = await authService.register(values);
+            // The backend does not return data.email, so we use the email from the form values
+            setRegisterData(values.email, null);
             router.push("/otp");
             toast.success("OTP sent on email")
           } catch (err: any) {

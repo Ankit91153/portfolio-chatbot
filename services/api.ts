@@ -1,4 +1,5 @@
 import { AxiosRequestConfigWithRetry } from "@/lib/retry";
+import { useAuthStore } from "@/stores";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -10,16 +11,16 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  // Get access token from localStorage
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Get access token from Zustand store outside of React components
+  const { accessToken } = useAuthStore.getState();
+
+  console.log(accessToken);
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
-  
+
   // Handle multipart/form-data for file uploads
-  if (config.url === "resume/parse_resume") {
+  if (config.url === "/api/professional-data/parse-resume") {
     config.headers["Content-Type"] = "multipart/form-data";
   }
 

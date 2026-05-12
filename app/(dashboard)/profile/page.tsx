@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { Save, Home } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +18,7 @@ import { SkillsSection } from "@/components/profile/SkillsSection";
 import { ExperienceSection } from "@/components/profile/ExperienceSection";
 import { CertificationSection } from "@/components/profile/CertificationSection";
 import { AchievementSection } from "@/components/profile/AchievementSection";
+import { DefaultQuestionsSection } from "@/components/profile/DefaultQuestionsSection";
 import { ProfileData } from "@/types/profile";
 
 export default function ProfilePage() {
@@ -25,11 +27,7 @@ export default function ProfilePage() {
 
   // Protect route - redirect if not logged in
   useEffect(() => {
-    if (
-      !accessToken &&
-      !(typeof window !== "undefined" && localStorage.getItem("access_token"))
-    ) {
-      toast.error("Please login first");
+    if (!accessToken) {
       router.push("/login");
     }
   }, [accessToken, router]);
@@ -49,7 +47,37 @@ export default function ProfilePage() {
     experience: [],
     certifications: [],
     achievements: [],
+    defaultQuestions: [],
   });
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const result = await profileService.getProfile();
+        if (result.success && result.data?.professionalData) {
+          const loadedData = result.data.professionalData;
+          setProfileData({
+            aboutMe: loadedData.aboutMe || "",
+            personalInfo: loadedData.personalInfo || {
+              fullName: "", email: "", phone: "", location: "", linkedin: "", github: "", portfolio: "",
+            },
+            educations: loadedData.educations || [],
+            skills: loadedData.skills || [],
+            experience: loadedData.experience || [],
+            certifications: loadedData.certifications || [],
+            achievements: loadedData.achievements || [],
+            defaultQuestions: result.data.defaultQuestions || loadedData.defaultQuestions || [],
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      }
+    }
+
+    if (accessToken) {
+      loadProfile();
+    }
+  }, [accessToken]);
 
   const [saving, setSaving] = useState(false);
 
@@ -107,14 +135,21 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">My Profile</h2>
-          <p className="text-muted-foreground">
-            Manage your professional information
-          </p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card p-6 rounded-xl border shadow-sm">
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <Button variant="outline" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">
+              <Home className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">My Profile</h2>
+            <p className="text-muted-foreground mt-1">
+              Manage your professional information to power your AI chatbot
+            </p>
+          </div>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving} size="lg" className="shadow-md hover:shadow-lg transition-all w-full md:w-auto">
           <Save className="mr-2 h-4 w-4" />
           {saving ? "Saving..." : "Save Profile"}
         </Button>
@@ -122,16 +157,17 @@ export default function ProfilePage() {
 
       <FileUploader onDataExtracted={handleDataExtracted} />
 
-      <Card className="p-6">
-        <Tabs defaultValue="about" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="personal">Personal</TabsTrigger>
-            <TabsTrigger value="education">Education</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
-            <TabsTrigger value="experience">Experience</TabsTrigger>
-            <TabsTrigger value="certifications">Certifications</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+      <Card className="p-6 md:p-8 border-t-4 border-t-primary shadow-lg rounded-xl overflow-hidden">
+        <Tabs defaultValue="about" className="space-y-8">
+          <TabsList className="flex flex-wrap w-full justify-start h-auto p-1.5 bg-muted/60 rounded-xl gap-1.5 mb-6">
+            <TabsTrigger value="about" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">About</TabsTrigger>
+            <TabsTrigger value="personal" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Personal</TabsTrigger>
+            <TabsTrigger value="education" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Education</TabsTrigger>
+            <TabsTrigger value="skills" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Skills</TabsTrigger>
+            <TabsTrigger value="experience" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Experience</TabsTrigger>
+            <TabsTrigger value="certifications" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Certifications</TabsTrigger>
+            <TabsTrigger value="achievements" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Achievements</TabsTrigger>
+            <TabsTrigger value="questions" className="flex-1 min-w-[100px] rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-md py-2.5 px-4 font-medium transition-all">Q&A</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about" className="space-y-4">
@@ -193,6 +229,15 @@ export default function ProfilePage() {
               data={profileData.achievements}
               onChange={(data) =>
                 setProfileData((prev) => ({ ...prev, achievements: data }))
+              }
+            />
+          </TabsContent>
+
+          <TabsContent value="questions" className="space-y-4">
+            <DefaultQuestionsSection
+              data={profileData.defaultQuestions || []}
+              onChange={(data) =>
+                setProfileData((prev) => ({ ...prev, defaultQuestions: data }))
               }
             />
           </TabsContent>

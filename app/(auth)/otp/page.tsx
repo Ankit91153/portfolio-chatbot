@@ -46,6 +46,8 @@ export default function OtpPage() {
         onSubmit={async (values, { setSubmitting }) => {
           try {
             if (!email) {
+              toast.error("Session expired. Please register again.");
+              router.push("/register");
               return;
             }
             // send email + userId + otp to backend
@@ -55,6 +57,7 @@ export default function OtpPage() {
             router.push("/login");
           } catch (err: any) {
             console.log(err);
+            toast.error(err?.response?.data?.message || "Invalid OTP. Please try again.");
           } finally {
             setSubmitting(false);
           }

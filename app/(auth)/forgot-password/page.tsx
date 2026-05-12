@@ -41,8 +41,8 @@ export default function ForgotPasswordPage() {
         validateOnMount={true}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-           const response= await authService.forgotPassword(values);
-            setRegisterData(response?.data?.email, response?.data?.user_id);
+           const response = await authService.forgotPassword(values);
+            setRegisterData(values.email, null);
             toast.success("OTP sent to your email!");
             router.push("/reset-password");
           } catch (err: any) {

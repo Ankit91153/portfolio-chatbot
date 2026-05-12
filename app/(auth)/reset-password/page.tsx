@@ -77,6 +77,7 @@ export default function ResetPasswordPage() {
             console.log("RRRRRRRRRRRRRRRRR")
           } catch (err: any) {
             console.error(err);
+            toast.error(err?.response?.data?.message || "Failed to reset password. Please try again.");
           } finally {
             setSubmitting(false);
           }
